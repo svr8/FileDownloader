@@ -92,22 +92,19 @@ class FileDownloader {
             if (in != null) {
                 try {
                     in.close();
-                } catch (IOException e) {
-                }
+                } catch (IOException e) {}
             }
 
             if (fos != null) {
                 try {
                     fos.close();
-                } catch (IOException e) {
-                }
+                } catch (IOException e) {}
             }
 
             if (bout != null) {
                 try {
                     bout.close();
-                } catch (IOException e) {
-                }
+                } catch (IOException e) {}
             }
 
             if (connection != null)
