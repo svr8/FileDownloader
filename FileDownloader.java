@@ -22,7 +22,6 @@ class FileDownloader {
     }
  
     public void startDownload() {
-
         System.out.println("Starting Download...");
         while(!download());
         System.out.println("File downloaded successfully.");
