@@ -3,11 +3,18 @@ import java.net.*;
 
 class FileDownloader {
 
+    BufferedInputStream in;
+    FileOutputStream fos;
+    BufferedOutputStream bout;
+    URLConnection connection;
+
+    long downloaded = 0;
+
     final private String fileLocation;
     final private URL url;
-    
+
     FileDownloader(String strURL, String fileLocation) {
-        url = toURL(strURL);        
+        url = toURL(strURL);
         this.fileLocation = fileLocation;
     }
 
@@ -15,48 +22,42 @@ class FileDownloader {
         try {
             URL lURL = new URL(str);
             return lURL;
-        } catch(MalformedURLException e) {
+        } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
         }
     }
- 
+
     public void startDownload() {
         System.out.println("Starting Download...");
-        while(!download());
+        while (!download());
         System.out.println("File downloaded successfully.");
     }
 
     private boolean download() {
-        BufferedInputStream in = null;
-        FileOutputStream fos = null;
-        BufferedOutputStream bout = null;
-        URLConnection connection = null;
-
-        long downloaded = 0;
-
         try {
             connection = url.openConnection();
-            
+
             File file = new File(fileLocation);
-            if(file.exists()) {
+
+            if (file.exists()) {
                 downloaded = file.length();
             }
-            
-            connection.setRequestProperty("Range", "bytes="+downloaded+"-");
+
+            connection.setRequestProperty("Range", "bytes=" + downloaded + "-");
             connection.connect();
 
             try {
-                in = new BufferedInputStream( connection.getInputStream() );
-            } catch(IOException e) {
+                in = new BufferedInputStream(connection.getInputStream());
+            } catch (IOException e) {
                 int responseCode = 0;
                 try {
-                    responseCode = ((HttpURLConnection)connection).getResponseCode();
-                } catch(IOException e1) {
+                    responseCode = ((HttpURLConnection) connection).getResponseCode();
+                } catch (IOException e1) {
                     e1.printStackTrace();
                 }
 
-                if(responseCode == 416) {
+                if (responseCode == 416) {
                     return true;
                 } else {
                     e.printStackTrace();
@@ -64,17 +65,15 @@ class FileDownloader {
                 }
             }
 
-            fos = downloaded == 0 ?
-                    new FileOutputStream(fileLocation) :
-                    new FileOutputStream(fileLocation, true);
-            
+            fos = downloaded == 0 ? new FileOutputStream(fileLocation) : new FileOutputStream(fileLocation, true);
+
             bout = new BufferedOutputStream(fos, 1024);
 
             byte[] data = new byte[1024];
             int x = 0;
 
             System.out.println("Download Progess: " + downloaded + "B.");
-            while( (x=in.read(data, 0, 1024))!=-1 ) {
+            while ((x = in.read(data, 0, 1024)) != -1) {
                 bout.write(data, 0, x);
                 System.out.println("Download Progess: " + downloaded + "B.");
                 downloaded++;
@@ -86,29 +85,34 @@ class FileDownloader {
             bout.close();
             return false;
 
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
         } finally {
-            if(in != null) {
-                try { in.close(); }
-                catch(IOException e) {}
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
             }
 
-            if(fos != null) {
-                try { fos.close(); }
-                catch(IOException e) {}
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                }
             }
 
-            if(bout != null) {
-                try { bout.close(); }
-                catch(IOException e) {}
+            if (bout != null) {
+                try {
+                    bout.close();
+                } catch (IOException e) {
+                }
             }
 
-            if( connection!=null )
-                ((HttpURLConnection)connection).disconnect();
+            if (connection != null)
+                ((HttpURLConnection) connection).disconnect();
         }
-    } 
-
+    }
 
 }
